@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="sOML9F" name="basicOsc" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" pluginVST3Category="Instrument">
   <MAINGROUP id="ZTcHe7" name="basicOsc">
     <GROUP id="{018BAB4E-A237-7B36-D2B7-A4A5459237A8}" name="Source">
       <FILE id="BUPXS6" name="PluginProcessor.cpp" compile="1" resource="0"
