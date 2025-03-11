@@ -74,5 +74,7 @@ public:
     void renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int startSample, int numSamples) override;
 private:
     juce::dsp::Oscillator<float> osc{ [](float x) {return std::sin(x); } };
+    juce::ADSR adsr;
+    juce::ADSR::Parameters adsrParams;
 
 };
