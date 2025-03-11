@@ -55,5 +55,23 @@ public:
 
 private:
     juce::dsp::Oscillator<float> osc{ [](float x) {return std::sin(x); } };
+    juce::Synthesiser synth;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BasicOscAudioProcessor)
+};
+
+class SynthSound : public juce::SynthesiserSound {
+    bool appliesToNote(int midiNoteNumber) override { return true; }
+    bool appliesToChannel(int midiChannel) override { return true; }
+};
+
+class SynthVoice : public juce::SynthesiserVoice {
+public:
+    bool canPlaySound(juce::SynthesiserSound*) override;
+    void startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int currentPitchWheelPosition) override;
+    void stopNote(float velocity, bool allowTailOff) override;
+    void controllerMoved(int controllerNumber, int newControllerValue) override;
+    void pitchWheelMoved(int newPitchWheelValue) override {}
+    void prepareToPlay(double sampleRate, int samplesPerBlock, int outputChannels);
+    void renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int startSample, int numSamples) override;
+private:
 };
