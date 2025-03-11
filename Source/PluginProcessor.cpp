@@ -201,6 +201,8 @@ void SynthVoice::startNote(int midiNoteNumber, float velocity, juce::Synthesiser
 void SynthVoice::stopNote(float velocity, bool allowTailOff) {
     
 }
+void SynthVoice::controllerMoved(int controllerNumber, int newControllerValue) {
+}
 
 void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int outputChannels) {
 
