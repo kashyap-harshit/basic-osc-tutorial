@@ -54,7 +54,6 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
-    juce::dsp::Oscillator<float> osc{ [](float x) {return std::sin(x); } };
     juce::Synthesiser synth;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BasicOscAudioProcessor)
 };
@@ -74,4 +73,6 @@ public:
     void prepareToPlay(double sampleRate, int samplesPerBlock, int outputChannels);
     void renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int startSample, int numSamples) override;
 private:
+    juce::dsp::Oscillator<float> osc{ [](float x) {return std::sin(x); } };
+
 };

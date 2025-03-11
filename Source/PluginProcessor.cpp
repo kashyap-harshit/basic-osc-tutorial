@@ -93,11 +93,13 @@ void BasicOscAudioProcessor::changeProgramName (int index, const juce::String& n
 //==============================================================================
 void BasicOscAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    juce::dsp::ProcessSpec spec;
-    spec.maximumBlockSize = samplesPerBlock;
-    spec.sampleRate = sampleRate;
-    spec.numChannels = getTotalNumOutputChannels();
-    osc.prepare(spec);
+    synth.setCurrentPlaybackSampleRate(sampleRate);
+    for (int i = 0;i < synth.getNumVoices(); i++) {
+        if (auto voice = dynamic_cast<SynthVoice*>(synth.getVoice(i))) {
+            voice->prepareToPlay(sampleRate, samplesPerBlock, getTotalNumOutputChannels());
+        }
+    }
+
 }
 
 void BasicOscAudioProcessor::releaseResources()
@@ -135,14 +137,16 @@ bool BasicOscAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts)
 void BasicOscAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels  = getTotalNumInputChannels();
+    auto totalNumInputChannels = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
-
-
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
-    juce::dsp::AudioBlock<float> audioBlock{ buffer };
-    osc.process(juce::dsp::ProcessContextReplacing<float>(audioBlock));
+        buffer.clear(i, 0, buffer.getNumSamples());
+    for (int i = 0; i < synth.getNumVoices(); ++i) {
+        if (auto voice = dynamic_cast<juce::SynthesiserVoice*>(synth.getVoice(i))) {
+        }
+    }
+    synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+
 
 }
 
@@ -176,4 +180,31 @@ void BasicOscAudioProcessor::setStateInformation (const void* data, int sizeInBy
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new BasicOscAudioProcessor();
+}
+
+bool SynthVoice::canPlaySound(juce::SynthesiserSound* sound)
+{
+    return dynamic_cast<juce::SynthesiserSound*>(sound) != nullptr;
+}
+
+void SynthVoice::startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int currentPitchWheelPosition)
+{
+
+}
+
+void SynthVoice::stopNote(float velocity, bool allowTailOff) {
+
+}
+
+void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int outputChannels) {
+    juce::dsp::ProcessSpec spec;
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.sampleRate = sampleRate;
+    spec.numChannels = outputChannels;
+    osc.prepare(spec);
+}
+
+void SynthVoice::renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int startSample, int numSamples) {
+    juce::dsp::AudioBlock<float> audioBlock{ outputBuffer };
+    osc.process(juce::dsp::ProcessContextReplacing<float>(audioBlock));
 }
