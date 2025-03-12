@@ -19,7 +19,7 @@ BasicOscAudioProcessor::BasicOscAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ),theValueTree(*this, nullptr, "Parameters", createParams())
 #endif
 {
     synth.addSound(new SynthSound());
@@ -219,4 +219,11 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int s
     juce::dsp::AudioBlock<float> audioBlock{ outputBuffer };
     osc.process(juce::dsp::ProcessContextReplacing<float>(audioBlock));
     adsr.applyEnvelopeToBuffer(outputBuffer, startSample, numSamples);
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout BasicOscAudioProcessor::createParams() {
+    std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
+
+
+    return { params.begin(), params.end() };
 }
