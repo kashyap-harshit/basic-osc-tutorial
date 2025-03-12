@@ -19,7 +19,7 @@ BasicOscAudioProcessor::BasicOscAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ), theValueTree(*this, nullptr, "Parameters", createParams())
 #endif
 {
     synth.addSound(new SynthSound());
@@ -219,4 +219,18 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int s
     juce::dsp::AudioBlock<float> audioBlock{ outputBuffer };
     osc.process(juce::dsp::ProcessContextReplacing<float>(audioBlock));
     adsr.applyEnvelopeToBuffer(outputBuffer, startSample, numSamples);
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout BasicOscAudioProcessor::createParams() {
+    std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
+    params.push_back(std::make_unique<juce::AudioParameterChoice>("OSC", "Oscillator", juce::StringArray{ "Sine", "Saw", "Square", "Triangle" }, 0));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("ATTACK", "Attack", juce::NormalisableRange{ 0.0f, 1.0f }, 0.0f));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("DECAY", "Decay", juce::NormalisableRange{ 0.0f, 1.0f }, 0.0f));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("SUSTAIN", "Sustain", juce::NormalisableRange{ 0.0f, 1.0f }, 1.0f));
+
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("RELEASE", "Release", juce::NormalisableRange{ 0.0f, 3.0f }, 0.1f));
+
+    return { params.begin(), params.end() };
 }

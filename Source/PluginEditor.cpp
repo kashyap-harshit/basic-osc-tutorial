@@ -16,6 +16,45 @@ BasicOscAudioProcessorEditor::BasicOscAudioProcessorEditor (BasicOscAudioProcess
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (400, 300);
+
+    attackAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.theValueTree, "ATTACK", attackSlider);
+
+    decayAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.theValueTree, "DECAY", decaySlider);
+
+    sustainAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.theValueTree, "SUSTAIN", sustainSlider);
+
+    releaseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.theValueTree, "RELEASE", releaseSlider);
+
+    oscSelectAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(audioProcessor.theValueTree, "OSC", oscSelector);
+
+
+    attackSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+    attackSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 50, 25);
+    addAndMakeVisible(attackSlider);
+
+    decaySlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+    decaySlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 50, 25);
+    addAndMakeVisible(decaySlider);
+
+    sustainSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+    sustainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 50, 25);
+    addAndMakeVisible(sustainSlider);
+
+    releaseSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+    releaseSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 50, 25);
+    addAndMakeVisible(releaseSlider);
+
+    oscSelector.addItem("Sine", 1);
+    oscSelector.addItem("Saw", 2);
+    oscSelector.addItem("Square", 3);
+    oscSelector.addItem("Triangle", 4);
+
+    oscSelector.setSelectedId(audioProcessor.theValueTree.getRawParameterValue("OSC")->load() + 1);
+
+    oscSelector.setJustificationType(juce::Justification::centred);
+    addAndMakeVisible(oscSelector);
+
+
 }
 
 BasicOscAudioProcessorEditor::~BasicOscAudioProcessorEditor()
@@ -25,12 +64,7 @@ BasicOscAudioProcessorEditor::~BasicOscAudioProcessorEditor()
 //==============================================================================
 void BasicOscAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
-
-    g.setColour (juce::Colours::white);
-    g.setFont (juce::FontOptions (15.0f));
-    g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
+    g.fillAll(juce::Colour(251, 133, 0));
 }
 
 void BasicOscAudioProcessorEditor::resized()
