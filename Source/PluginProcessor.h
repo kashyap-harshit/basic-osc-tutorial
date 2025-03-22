@@ -74,6 +74,8 @@ public:
     void pitchWheelMoved(int newPitchWheelValue) override {}
     void prepareToPlay(double sampleRate, int samplesPerBlock, int outputChannels);
     void renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int startSample, int numSamples) override;
+    void updateADSR(float attack, float decay, float sustain, float release);
+    void changeOsc(int oscNum);
 private:
     juce::dsp::Oscillator<float> osc{ [](float x) {return std::sin(x); } };
     juce::ADSR adsr;

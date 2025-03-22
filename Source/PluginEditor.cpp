@@ -69,6 +69,20 @@ void BasicOscAudioProcessorEditor::paint (juce::Graphics& g)
 
 void BasicOscAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
+    const auto padding = 12;
+    const auto bounds = getLocalBounds().reduced(padding);
+    const auto sliderWidth = bounds.getWidth() / 4 - padding;
+    const auto sliderHeight = bounds.getWidth() / 2;
+    const auto sliderStartX = 18;
+    const auto sliderStartY = bounds.getHeight() / 2 - (sliderHeight / 4);
+
+
+    attackSlider.setBounds(sliderStartX, sliderStartY, sliderWidth, sliderHeight);
+    decaySlider.setBounds(attackSlider.getRight() + padding, sliderStartY, sliderWidth, sliderHeight);
+
+    sustainSlider.setBounds(decaySlider.getRight() + padding, sliderStartY, sliderWidth, sliderHeight);
+
+    releaseSlider.setBounds(sustainSlider.getRight() + padding, sliderStartY, sliderWidth, sliderHeight);
+
+    oscSelector.setBounds(bounds.getX(), bounds.getY(), bounds.getWidth(), 30);
 }
