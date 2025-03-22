@@ -228,18 +228,10 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int outpu
 }
 
 void SynthVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples) {
-    juce::AudioBuffer<float> tempBuffer(outputBuffer.getNumChannels(), numSamples);
-    tempBuffer.clear(); // Clear to accumulate from multiple voices
-
-    juce::dsp::AudioBlock<float> audioBlock{ tempBuffer };
+    juce::dsp::AudioBlock<float> audioBlock{ outputBuffer };
     osc.process(juce::dsp::ProcessContextReplacing<float>(audioBlock));
 
-    adsr.applyEnvelopeToBuffer(tempBuffer, 0, numSamples);
-
-    // Add tempBuffer's processed output to outputBuffer
-    for (int channel = 0; channel < outputBuffer.getNumChannels(); ++channel) {
-        outputBuffer.addFrom(channel, startSample, tempBuffer, channel, 0, numSamples);
-    }
+    adsr.applyEnvelopeToBuffer(outputBuffer, startSample, numSamples);
 }
 
 void SynthVoice::updateADSR(float attack, float decay, float sustain, float release) {
