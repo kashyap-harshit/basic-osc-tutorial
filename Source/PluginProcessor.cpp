@@ -25,6 +25,7 @@ BasicOscAudioProcessor::BasicOscAudioProcessor()
     synth.addSound(new SynthSound());
     synth.addVoice(new SynthVoice());
 
+
 }
 
 BasicOscAudioProcessor::~BasicOscAudioProcessor()
@@ -145,7 +146,17 @@ void BasicOscAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
     for (int i = 0; i < synth.getNumVoices(); ++i) {
-        if (auto voice = dynamic_cast<juce::SynthesiserVoice*>(synth.getVoice(i))) {
+        if (auto voice = dynamic_cast<SynthVoice*>(synth.getVoice(i))) {
+            auto& waveformType = *theValueTree.getRawParameterValue("OSC");
+
+            voice->changeOsc(waveformType);
+
+            auto& attack = *theValueTree.getRawParameterValue("ATTACK");
+            auto& decay = *theValueTree.getRawParameterValue("DECAY");
+            auto& sustain = *theValueTree.getRawParameterValue("SUSTAIN");
+            auto& release = *theValueTree.getRawParameterValue("RELEASE");
+            voice->updateADSR(attack, decay, sustain, release);
+
         }
     }
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
@@ -192,6 +203,7 @@ bool SynthVoice::canPlaySound(juce::SynthesiserSound* sound)
 
 void SynthVoice::startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int currentPitchWheelPosition)
 {
+    osc.reset();
     osc.setFrequency(juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber));
     adsr.noteOn();
 
@@ -215,11 +227,36 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int outpu
 
 }
 
-void SynthVoice::renderNextBlock(juce::AudioBuffer< float >& outputBuffer, int startSample, int numSamples) {
+void SynthVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples) {
     juce::dsp::AudioBlock<float> audioBlock{ outputBuffer };
     osc.process(juce::dsp::ProcessContextReplacing<float>(audioBlock));
+
     adsr.applyEnvelopeToBuffer(outputBuffer, startSample, numSamples);
 }
+
+void SynthVoice::updateADSR(float attack, float decay, float sustain, float release) {
+    adsrParams.attack = attack;
+    adsrParams.decay = decay;
+    adsrParams.sustain = sustain;
+    adsrParams.release = release;
+    adsr.setParameters(adsrParams);
+}
+void SynthVoice::changeOsc(int oscNum) {
+    if (oscNum == 0) {
+        osc.initialise([](float x) { return std::sin(x); }, 128); //sine
+    }
+    else if (oscNum == 1) {
+        osc.initialise([](float x) { return x / juce::MathConstants<float>::pi; }, 128); //saw
+    }
+    else if (oscNum == 2) {
+        osc.initialise([](float x) { return x < 0.0f ? -1.0f : 1.0f; }, 128); //sqaure
+    }
+    else if (oscNum == 3) {
+        osc.initialise([](float x) { return x < 0.0f ? -1.0f + (4.0f * (x + 0.5f)) : 1.0f - (4.0f * (x - 0.5f)); }, 128); //triangle
+    }
+}
+
+
 
 juce::AudioProcessorValueTreeState::ParameterLayout BasicOscAudioProcessor::createParams() {
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
