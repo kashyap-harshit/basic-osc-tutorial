@@ -1,6 +1,6 @@
-# Basic OSC Tutorial
+# Oscillator VST Plugin
 
-A simple open-source VST synth project made with JUCE. This repository serves as an introductory tutorial for building audio plugins from scratch and understanding the basics of synthesizer (synth) development.
+A simple VST synth project made with JUCE. This repository serves as an introductory tutorial for building audio plugins from scratch and understanding the basics of synthesizer (synth) development.
 
 ## Overview
 
@@ -15,9 +15,8 @@ You’ll find all the source code for a basic oscillator-based synth (OSC = osci
 
 ## Features
 
-- **Basic oscillator(s):** Fundamental sound source for synthesis (sine, square, saw, etc.)
+- **Oscillator(s):** Fundamental sound source for synthesis (sine, square, saw, etc.)
 - **Simple envelope generator:** Shape the amplitude of each note
-- **Minimal UI:** Just enough to tweak and hear your results
 - **Well-commented code:** Learn as you read and experiment
 
 
